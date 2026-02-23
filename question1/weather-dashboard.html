@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Card - Question 1</title>
+    <style>
+        /* CSS Variables for easy colors */
+        :root {
+            --primary: #2563eb;
+            --success: #16a34a;
+            --gray: #64748b;
+            --light: #f8fafc;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* Responsive Container */
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+            width: 100%; /* Mobile: 1 card full width */
+            max-width: 350px;
+            transition: 0.3s;
+        }
+
+        /* Breakpoints Logic */
+        @media (min-width: 768px) { .card { max-width: 400px; } } /* Tablet */
+        @media (min-width: 1024px) { .card { max-width: 320px; } } /* Desktop */
+
+        .product-img-container {
+            height: 250px;
+            background: #f1f5f9;
+            position: relative;
+        }
+
+        .product-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .discount-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ef4444;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .content { padding: 20px; }
+        
+        h2 { margin: 0 0 10px; font-size: 1.4rem; color: #1e293b; }
+        
+        .description { font-size: 0.9rem; color: var(--gray); margin-bottom: 15px; }
+
+        .price-row { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+        .discounted-price { font-size: 1.5rem; font-weight: 700; color: #1e293b; }
+        .original-price { text-decoration: line-through; color: var(--gray); font-size: 1rem; }
+
+        /* Quantity Selector */
+        .qty-container { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+        .qty-btn {
+            width: 35px;
+            height: 35px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .qty-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        #qty-value { font-weight: bold; font-size: 1.1rem; }
+
+        .add-to-cart {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .add-to-cart:hover { background: #1d4ed8; }
+
+        #success-msg {
+            display: none;
+            background: #dcfce7;
+            color: var(--success);
+            text-align: center;
+            padding: 10px;
+            margin-top: 15px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="product-img-container">
+        <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500" 
+             alt="Smart Watch" 
+             class="product-img" 
+             id="prod-img"
+             onerror="this.src='https://via.placeholder.com/400x400?text=Product+Image'">
+        <span class="discount-badge">20% OFF</span>
+    </div>
+
+    <div class="content">
+        <h2 id="prod-name">Premium Smart Watch</h2>
+        <p class="description">Water-resistant, heart rate monitor, and 7-day battery life. Stay connected in style.</p>
+        
+        <div class="price-row">
+            <span class="discounted-price" id="curr-price">$160.00</span>
+            <span class="original-price">$200.00</span>
+        </div>
+
+        <div class="qty-container">
+            <button class="qty-btn" id="minus-btn" aria-label="Decrease quantity">−</button>
+            <span id="qty-value">1</span>
+            <button class="qty-btn" id="plus-btn" aria-label="Increase quantity">+</button>
+        </div>
+
+        <button class="add-to-cart" id="add-btn">Add to Cart</button>
+        
+        <div id="success-msg">✅ Item added to cart!</div>
+    </div>
+</div>
+
+<script>
+    const qtyValue = document.getElementById('qty-value');
+    const plusBtn = document.getElementById('plus-btn');
+    const minusBtn = document.getElementById('minus-btn');
+    const addBtn = document.getElementById('add-btn');
+    const successMsg = document.getElementById('success-msg');
+
+    let count = 1;
+
+    // Increment / Decrement Logic
+    function updateQty(val) {
+        count += val;
+        
+        // Limits: Not below 1, not above 10
+        if (count <= 1) {
+            count = 1;
+            minusBtn.disabled = true;
+        } else {
+            minusBtn.disabled = false;
+        }
+
+        if (count >= 10) {
+            count = 10;
+            plusBtn.disabled = true;
+        } else {
+            plusBtn.disabled = false;
+        }
+
+        qtyValue.innerText = count;
+    }
+
+    plusBtn.onclick = () => updateQty(1);
+    minusBtn.onclick = () => updateQty(-1);
+
+    // Initial state check
+    updateQty(0);
+
+    // Add to Cart Action
+    addBtn.onclick = () => {
+        const prodName = document.getElementById('prod-name').innerText;
+        const price = 160;
+        
+        // Log details to console as requested
+        console.log("--- Cart Item Added ---");
+        console.log(`Product: ${prodName}`);
+        console.log(`Quantity: ${count}`);
+        console.log(`Price per unit: $${price}`);
+        console.log(`Total: $${count * price}`);
+        
+        // Success notification
+        successMsg.style.display = 'block';
+        setTimeout(() => {
+            successMsg.style.display = 'none';
+        }, 3000);
+    };
+</script>
+
+</body>
+</html>
